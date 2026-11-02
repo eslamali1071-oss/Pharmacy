@@ -1,6 +1,7 @@
 {
-  "name": "صيدليتك",
-  "short_name": "صيدليتك",
+  "id": "/Pharmacy/",
+  "name": "صيدلية اسامه - اطلب دوائك",
+  "short_name": "اطلب دوائك",
   "description": "صيدلية أونلاين لطلب الأدوية والمنتجات",
   "lang": "ar",
   "dir": "rtl",
@@ -14,12 +15,14 @@
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
