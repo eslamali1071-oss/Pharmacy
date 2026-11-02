@@ -249,5 +249,13 @@ onSnapshot(collection(db,'inv'),sn=>{INV={};sn.docs.forEach(x=>INV[x.id]=x.data(
 onSnapshot(collection(db,'prods'),sn=>{setProds(sn);if(tab==='shop'&&$('#sheet').hidden)render()},()=>{});
 chips();render();track();
 </script>
+ <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .catch(error => console.error('SW error:', error));
+  });
+}
+ </script>
 </body>
 </html>
