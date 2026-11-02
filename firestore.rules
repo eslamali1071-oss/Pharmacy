@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.uid in ['67ZLg9nutAcbQDj2aeeQaLHAg9y2'];
+    }
+
+    function validOrder(d) {
+      return d.keys().hasOnly(['n','ph','ad','pay','L','tot','fee','st','ts'])
+        && d.n is string && d.n.size() > 0 && d.n.size() <= 80
+        && d.ph is string && d.ph.size() >= 8 && d.ph.size() <= 20
+        && d.ad is string && d.ad.size() > 0 && d.ad.size() <= 300
+        && d.pay in ['كاش عند الاستلام', 'فودافون كاش']
+        && d.L is list && d.L.size() > 0 && d.L.size() <= 60
+        && d.tot is number && d.tot > 0 && d.tot < 100000
+        && d.fee is number && d.fee >= 0 && d.fee <= 100
+        && d.st == 'جديد'
+        && d.ts == request.time;
+    }
+
+    function validReview(d) {
+      return d.keys().hasOnly(['pid','n','s','t','ts'])
+        && d.pid is number
+        && d.n is string && d.n.size() > 0 && d.n.size() <= 40
+        && d.t is string && d.t.size() > 0 && d.t.size() <= 300
+        && d.s in [1, 2, 3, 4, 5]
+        && d.ts == request.time;
+    }
+
+    // أسعار وكميات المنتجات: الكل يقرأ، المسؤول فقط يعدّل
+    match /inv/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // المنتجات المضافة يدويًا: الكل يقرأ، المسؤول فقط يضيف ويعدّل
+    match /prods/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // الطلبات: العميل يضيف طلب بس، ويقرأ طلبه لو عارف رقمه، والمسؤول يشوف الكل
+    match /orders/{id} {
+      allow create: if validOrder(request.resource.data);
+      allow get: if true;
+      allow list: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    // التقييمات: الكل يقرأ ويضيف تقييم صحيح، والمسؤول فقط يحذف
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if validReview(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
